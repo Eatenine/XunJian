@@ -45,7 +45,7 @@
         android:layout_height="45dp"
         android:background="@drawable/black_circular_view"
         android:text="开始扫描"
-        android:id="@+id/sanner"
+        android:id="@+id/sannerButton"
         android:textSize="25dp"
         android:textColor="#ffffff"
         android:layout_marginBottom="100dp"

@@ -19,29 +19,46 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    Button sanner ;
+    Button sannerButton ;
     ImageView imageViewScanning;
     final String TAG = "lwj--------------";
     BluetoothAdapter mBluetoothAdapter;
-    int searchMiles = 3000;//搜索时间
-    String devicesNames ="";
+    int searchMiles = 5000;//搜索时间
+    String devicesNames ="111111111111111";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sanner = (Button) findViewById(R.id.sanner);
-        sanner.setOnClickListener(new View.OnClickListener() {
 
+        //找到搜索按钮，以及监听点击
+        sannerButton = (Button) findViewById(R.id.sannerButton);
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //判断蓝牙状态
+//        if(mBluetoothAdapter.getState()==BluetoothAdapter.STATE_OFF){
+//            sannerButton.setText("打开蓝牙");
+//        }
+
+        sannerButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
                 //这是个啥？？注册广播？
                 IntentFilter filter=new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 registerReceiver(mReceiver,filter);
+                //先判断手机蓝牙是否打开，
                 if(mBluetoothAdapter.isEnabled()){
-                    sanner.setText("正在搜索...");
+                    //临时代码，学习一下
+                    String localBTName = mBluetoothAdapter.getName();
+                    String localBTMac = mBluetoothAdapter.getAddress();
+
+                    Log.i(TAG,"蓝牙名字为："+localBTName+",MAC地址为："+localBTMac+"。");
+
+                    //界面文字变更
+                    sannerButton.setText("正在搜索...");
+                    sannerButton.setClickable(false);
+                    //图片旋转，首页动画效果
                     imageViewScanning = (ImageView) findViewById(R.id.imageScanning);
                     imageViewScanning.setVisibility(View.VISIBLE);
                     RotateAnimation animation = new RotateAnimation(0, 360,Animation.RELATIVE_TO_SELF,
@@ -55,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            //蓝牙搜索
                             BTScan();
 
 
@@ -67,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
                                 public void run() {
                                     //页面跳转
                                     gotoActivity();
+                                    mBluetoothAdapter.cancelDiscovery();
+                                    Log.i(TAG,"蓝牙搜索停止了");
+                                    Log.i(TAG,devicesNames);
                                 }
                             }
                             , searchMiles);
@@ -103,9 +124,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart(){
         super.onRestart();
-        sanner = (Button) findViewById(R.id.sanner);
+        sannerButton = (Button) findViewById(R.id.sannerButton);
 
-        sanner.setText("开始扫描");
+        sannerButton.setText("开始扫描");
+        sannerButton.setClickable(true);
     }
 
     //TODO 这是网上乱找的，不会用，研究下或者重新找办法
